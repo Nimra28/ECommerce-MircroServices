@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  user-service:
+    build: ./UserService
+    ports:
+      - "5001:5001"
+    depends_on:
+      - mongodb
+    environment:
+      - PORT=5001
+
+  product-service:
+    build: ./ProductService
+    ports:
+      - "5002:5002"
+    depends_on:
+      - mongodb
+    environment:
+      - PORT=5002
+
+  order-service:
+    build: ./OrderService
+    ports:
+      - "5003:5003"
+    depends_on:
+      - mongodb
+      - user-service
+      - product-service
+    environment:
+      - PORT=5003
+
+  payment-service:
+    build: ./PaymentService
+    ports:
+      - "5004:5004"
+    depends_on:
+      - mongodb
+      - order-service
+    environment:
+      - PORT=5004
+
+volumes:
+  mongodb_data:
